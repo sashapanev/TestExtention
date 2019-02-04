@@ -3,6 +3,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	var saveValueButton = document.getElementById('saveVal');
 	var savedDescriptionField = document.getElementById('description');
 	var k = "";
+	var CONST_KEY_MODE = 'false'; //этот режим переключает работу sync.set на сохранение по константе, если true, тогда ключ - переменная k (хранит URL)	
+	
+	
+	
 	chrome.tabs.getSelected(null, function(tab) {
 		k = tab.url;
 	});
@@ -22,13 +26,36 @@ document.addEventListener('DOMContentLoaded', function() {
 			
 			obj[k] = v;
 			
-			chrome.storage.sync.set({'savedComment' : v}, function() {
-				//alert('Value is set to ' + v);
-			});
+			if (CONST_KEY_MODE == 'false') {
+				chrome.storage.sync.set({'savedComment' : v}, function() {
+					//alert('Value is set to ' + v);
+				});
+					chrome.tabs.getSelected(null, function(tab) {
+					/*Тут нет проблем, но хранится один комент для всех URL-ов*/
+					chrome.storage.sync.get('savedComment', function(result) {
+						//alert('Value currently is ' + result.savedComment);
+						let res = result.savedComment;
+						savedDescriptionField.value = res;
+						});
+					});
+
+			} else {
+				chrome.storage.sync.set({k : v}, function() {
+					//alert('Value is set to ' + v);
+				});
+				
+				chrome.tabs.getSelected(null, function(tab) {
+					/*ПРОБЛЕМА ВОЗНИКАЕТ ТУТ, если пытаться получить со stogare.get не констатной строкой, а переменной k. Там в закоменченном коде есть*/
+					chrome.storage.sync.get(k, function(result) {
+					//alert('Value currently is ' + result.k);
+					let res = result.k;
+					savedDescriptionField.value = res;
+					});
+				});
 			
-			/*chrome.storage.sync.set({k : v}, function() {
-				//alert('Value is set to ' + v);
-			});*/
+			}
+			
+			
 			
 			chrome.tabs.getSelected(null, function(tab) {
 					/*ПРОБЛЕМА ВОЗНИКАЕТ ТУТ, если пытаться получить со stogare.get не констатной строкой, а переменной k. Там в закоменченном коде есть*/
@@ -57,16 +84,27 @@ document.addEventListener('DOMContentLoaded', function() {
 	});	*/
 	
 	
-	chrome.tabs.getSelected(null, function(tab) {
-			chrome.storage.sync.get('savedComment', function(result) {
-			//chrome.storage.sync.get(k, function(result) {
+	if (CONST_KEY_MODE == 'false') {
+		chrome.tabs.getSelected(null, function(tab) {
+		/*Тут нет проблем, но хранится один комент для всех URL-ов*/
+		chrome.storage.sync.get('savedComment', function(result) {
 			//alert('Value currently is ' + result.savedComment);
-			//alert('Value currently is ' + result.k);
 			let res = result.savedComment;
-			//let res = result.k;
 			savedDescriptionField.value = res;
+			});
 		});
-	});
+
+	} else {
+		chrome.tabs.getSelected(null, function(tab) {
+			/*ПРОБЛЕМА ВОЗНИКАЕТ ТУТ, если пытаться получить со stogare.get не констатной строкой, а переменной k. Там в закоменченном коде есть*/
+			chrome.storage.sync.get(k, function(result) {
+			//alert('Value currently is ' + result.k);
+			let res = result.k;
+			savedDescriptionField.value = res;
+			});
+		});
+		
+	}
 	
 	
 	
