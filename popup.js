@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			});*/
 			
 			chrome.tabs.getSelected(null, function(tab) {
+					/*ПРОБЛЕМА ВОЗНИКАЕТ ТУТ, если пытаться получить со stogare.get не констатной строкой, а переменной k. Там в закоменченном коде есть*/
 					chrome.storage.sync.get('savedComment', function(result) {
 					//chrome.storage.sync.get(k, function(result) {
 					//alert('Value currently is ' + result.savedComment);
