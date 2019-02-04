@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, false);
 	
-	/*chrome.storage.local.get(null, function(items) {
+	chrome.storage.sync.get(null, function(items) {
 		var [allKeys] = Object.keys(items);
 		//alert(allKeys);
 		for (var i in allKeys){
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				break;
 			}
 		}
-	});	*/
+	});
 	
 	if (CONST_KEY_MODE == 'false') {
 		chrome.tabs.getSelected(null, function(tab) {
