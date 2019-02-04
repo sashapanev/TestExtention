@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	var saveDescrButton = document.getElementById('saveVal');
 	var savedDescriptionField = document.getElementById('description');
 	
-	var CONST_KEY_MODE = 'true'; //этот режим переключает работу sync.set на сохранение по константе, если true, тогда ключ - переменная k (хранит URL)	
+	var CONST_KEY_MODE = 'true'; //этот режим переключает работу sync.set на сохранение по переменной, если true, тогда ключ - переменная k (хранит URL)	
 	
 	var k = '';
 
@@ -19,10 +19,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			let val = inputForSaveField.value;
 			d.body.appendChild(f);
 			k = tab.url;
-			//k.toString();
-			let obj = {};
+			
 			let v = inputForSaveField.value;
 			
+			let obj = {};
 			obj[k] = v;
 			
 			if (CONST_KEY_MODE == 'false') {
@@ -40,14 +40,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 			} else {
 				chrome.storage.sync.set({k : v}, function() {
-					//alert('Value is set to ' + v);
+					alert('Value is set to ' + v + 'with key = ' + k);
 				});
 				
 				chrome.tabs.getSelected(null, function(tab) {
 				/*ПРОБЛЕМА ВОЗНИКАЕТ ТУТ, если пытаться получить со stogare.get не констатной строкой, а переменной k. Там в закоменченном коде есть*/
 					chrome.storage.sync.get(k, function(result) {
-						//alert('Value currently is ' + result.k);
+						alert('Value currently is ' + result.k);
 						let res = result.k; //если передавать в get k, а не константную строку, то хз, что писать тут :(
+							//видимо я вообще неправильно использую sync.get, но просто localStorage не подходит, потому что
+							//я могу заходить с разных компов				
 						savedDescriptionField.value = res;
 					});
 				});
@@ -56,16 +58,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, false);
 	
-	chrome.storage.sync.get(null, function(items) {
+	/*chrome.storage.sync.get(null, function(items) {
 		var [allKeys] = Object.keys(items);
-		//alert(allKeys);
+		alert(allKeys);
 		for (var i in allKeys){
 			if (i == k){
 				alert(k);
 				break;
 			}
 		}
-	});
+	});*/
 	
 	if (CONST_KEY_MODE == 'false') {
 		chrome.tabs.getSelected(null, function(tab) {
@@ -87,4 +89,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			});
 		});
 	}
+
+
 }, false);
